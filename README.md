@@ -1,6 +1,6 @@
 # Custom Chart Widget for WinCC OA Dashboard
 
-Add **any** [Apache ECharts](https://echarts.apache.org/) visualization to your WinCC OA Dashboard with a single custom widget.
+WInCC OA has a new web dashbaord but the available widgets are limited. Use this custom widget widget to add **any** [Apache ECharts](https://echarts.apache.org/) visualization to your WinCC OA Dashboard with a single custom widget (make sure you perform a complete testing before deploying it in a production environment. This project is intended for training purposes only).
 
 Write JavaScript that returns an ECharts options object — the widget handles rendering, resizing, theming, datapoint binding, and history buffering automatically.
 
