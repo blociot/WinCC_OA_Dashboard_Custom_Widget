@@ -1,0 +1,23 @@
+{
+  "types": ["int", "float", "long", "uint", "ulong", "string", "bool", "dyn_int", "dyn_float", "dyn_string", "dyn_bool", "dyn_dyn_int", "dyn_dyn_float", "dyn_dyn_string"],
+  "widgetType": "custom-chart",
+  "label": "Custom Chart",
+  "description": "Write JavaScript code to create any Apache ECharts chart. Full access to the ECharts API via a code editor.",
+  "size": {
+    "minRows": 4,
+    "minCols": 4
+  },
+  "defaultSettings": {
+    "showTooltip": true,
+    "timeRange": "1h",
+    "chartCode": "// Write JavaScript that returns an ECharts options object.\n// Available variables:\n//   dp[0].value, dp[1].value ...  - latest values (up to 4 datapoints)\n//   dp[0].history   - {values: [], timestamps: []} buffered locally\n//   dp[0].name      - datapoint address\n//   animation, font, bgColor\n//\n// Example: Single line trend (uses first datapoint)\n\nvar data = [];\nvar d = dp[0];\nif (d.history && d.history.timestamps) {\n  data = d.history.timestamps.map(function(t, i) {\n    return [t, d.history.values[i]];\n  });\n}\n\nreturn {\n  animation: animation,\n  textStyle: { fontFamily: font },\n  backgroundColor: bgColor,\n  tooltip: { trigger: 'axis' },\n  xAxis: { type: 'time' },\n  yAxis: { type: 'value' },\n  series: [{\n    name: d.name || 'Value',\n    type: 'line',\n    data: data,\n    smooth: true\n  }]\n};"
+  },
+  "svgFile": "/data/WebUI/svg/custom-chart.svg",
+  "componentSettings": {
+    "styles": [],
+    "scripts": ["custom-chart"],
+    "tagname": "wui-widget-custom-chart",
+    "jsonSchema": "StandardLibrary/Charts/custom-chart-json-schema",
+    "uiSchema": "StandardLibrary/Charts/custom-chart-ui-schema"
+  }
+}

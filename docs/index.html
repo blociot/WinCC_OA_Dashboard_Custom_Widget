@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Chart Widget for WinCC OA Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-code: #1c2128;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-muted: #8b949e;
+    --text-heading: #f0f6fc;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 16px;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .hero {
+    text-align: center;
+    padding: 60px 24px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero svg { margin-bottom: 20px; }
+  .hero h1 {
+    font-size: 2.2em;
+    color: var(--text-heading);
+    margin-bottom: 12px;
+  }
+  .hero p {
+    font-size: 1.15em;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .badges { margin-top: 16px; }
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin: 4px;
+  }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--accent2); }
+  .badge-orange { background: rgba(247,129,102,0.15); color: var(--accent3); }
+
+  /* Navigation */
+  nav {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 12px 0;
+  }
+  nav .container {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    padding: 4px 0;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--accent); }
+
+  /* Sections */
+  section {
+    padding: 48px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section:last-child { border-bottom: none; }
+
+  h2 {
+    font-size: 1.6em;
+    color: var(--text-heading);
+    margin-bottom: 24px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+  }
+  h3 {
+    font-size: 1.2em;
+    color: var(--text-heading);
+    margin: 32px 0 12px;
+  }
+  h4 {
+    font-size: 1em;
+    color: var(--accent);
+    margin: 20px 0 8px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Code blocks */
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 12px 0 20px;
+    font-size: 0.88em;
+    line-height: 1.5;
+  }
+  code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    color: #e6edf3;
+  }
+  p code, li code, td code {
+    background: var(--bg-code);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--accent3);
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: var(--bg-card);
+    color: var(--text-heading);
+    font-weight: 600;
+  }
+
+  /* Lists */
+  ul, ol {
+    margin: 8px 0 16px 24px;
+  }
+  li { margin-bottom: 6px; }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+  .card h3 { margin-top: 0; }
+
+  /* File tree */
+  .file-tree {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: monospace;
+    font-size: 0.88em;
+    line-height: 1.8;
+    margin: 12px 0 20px;
+  }
+  .file-tree .folder { color: var(--accent); }
+  .file-tree .file { color: var(--text); }
+  .file-tree .desc { color: var(--text-muted); }
+
+  /* Steps */
+  .step {
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .step-num {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9em;
+  }
+  .step-content { flex: 1; }
+
+  /* Example cards */
+  .example {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 24px 0;
+    overflow: hidden;
+  }
+  .example-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .example-header h3 {
+    margin: 0;
+    font-size: 1.1em;
+  }
+  .example-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .dp-count {
+    font-size: 0.8em;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .dp-1 { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .dp-2 { background: rgba(210,168,255,0.15); color: var(--accent4); }
+  .dp-3 { background: rgba(247,129,102,0.15); color: var(--accent3); }
+  .dp-5 { background: rgba(63,185,80,0.15); color: var(--accent2); }
+  .example-body { padding: 0; }
+  .example-body pre {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+  .example-desc {
+    padding: 12px 20px;
+    color: var(--text-muted);
+    font-size: 0.92em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Preview */
+  .example-preview {
+    height: 320px;
+    border-bottom: 1px solid var(--border);
+    background: #0d1117;
+    position: relative;
+  }
+  .example-preview-label {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.7em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Code toggle */
+  .code-toggle {
+    display: block;
+    width: 100%;
+    padding: 10px 20px;
+    background: var(--bg-code);
+    border: none;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85em;
+    font-family: inherit;
+    text-align: left;
+    transition: color 0.2s;
+  }
+  .code-toggle:hover { color: var(--text-heading); }
+  .code-toggle::before {
+    content: '\25B6';
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 0.7em;
+    transition: transform 0.2s;
+  }
+  .code-toggle.open::before {
+    transform: rotate(90deg);
+  }
+  .example-code {
+    display: none;
+  }
+  .example-code.open {
+    display: block;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--text-heading); border-color: var(--text-muted); }
+
+  /* Alert boxes */
+  .alert {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+    border-left: 4px solid;
+  }
+  .alert-info { background: rgba(88,166,255,0.08); border-color: var(--accent); }
+  .alert-warn { background: rgba(247,129,102,0.08); border-color: var(--accent3); }
+  .alert-tip { background: rgba(63,185,80,0.08); border-color: var(--accent2); }
+  .alert strong { color: var(--text-heading); }
+
+  /* Social / Support banner */
+  .support-banner {
+    background: linear-gradient(135deg, rgba(88,166,255,0.1), rgba(63,185,80,0.1));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin: 48px 0;
+  }
+  .support-banner h2 {
+    border-bottom: none;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .support-banner p {
+    color: var(--text-muted);
+    max-width: 500px;
+    margin: 0 auto 20px;
+  }
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95em;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .social-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    text-decoration: none;
+  }
+  .social-link svg { flex-shrink: 0; }
+  .social-yt {
+    background: rgba(255,0,0,0.15);
+    color: #ff4444;
+    border: 1px solid rgba(255,0,0,0.3);
+  }
+  .social-li {
+    background: rgba(0,119,181,0.15);
+    color: #0a94e4;
+    border: 1px solid rgba(0,119,181,0.3);
+  }
+  .social-gh {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text-muted);
+    font-size: 0.9em;
+  }
+  footer a { color: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.6em; }
+    pre { font-size: 0.82em; padding: 12px; }
+    .step { flex-direction: column; gap: 8px; }
+    .example-preview { height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 68 68" width="68" height="68">
+    <rect x="8" y="40" width="10" height="20" rx="2" fill="#40a9aa"/>
+    <rect x="22" y="28" width="10" height="32" rx="2" fill="#8cd4c2"/>
+    <rect x="36" y="16" width="10" height="44" rx="2" fill="#40a9aa"/>
+    <rect x="50" y="24" width="10" height="36" rx="2" fill="#8cd4c2"/>
+    <text x="34" y="18" text-anchor="middle" font-family="monospace" font-size="16" font-weight="bold" fill="#ef6a37">&lt;/&gt;</text>
+  </svg>
+  <h1>Custom Chart Widget</h1>
+  <p>Create any Apache ECharts visualization in WinCC OA Dashboard using a built-in JavaScript code editor.</p>
+  <p style="margin-top:8px;font-size:0.95em;">An open-source project by <a href="https://github.com/BlocIoT" target="_blank" style="font-weight:600;">BlocIoT</a></p>
+  <div class="badges">
+    <span class="badge badge-blue">WinCC OA 3.21</span>
+    <span class="badge badge-green">Apache ECharts 5.x</span>
+    <span class="badge badge-orange">Up to 5 Datapoints</span>
+    <span class="badge" style="background:rgba(255,255,255,0.08);color:var(--text-muted);">Apache 2.0 License</span>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav>
+  <div class="container">
+    <a href="#overview">Overview</a>
+    <a href="#installation">Installation</a>
+    <a href="#usage">Usage</a>
+    <a href="#api">API Reference</a>
+    <a href="#examples">Examples</a>
+    <a href="#converting">Converting ECharts Examples</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- Overview -->
+<section id="overview">
+  <h2>Overview</h2>
+  <p>
+    The <strong>Custom Chart</strong> widget adds a programmable charting component to the
+    WinCC OA Dashboard. Instead of being limited to pre-built chart types, you write JavaScript
+    code that returns an <a href="https://echarts.apache.org/en/option.html">Apache ECharts option object</a>.
+    This gives you access to the full ECharts library: line charts, bar charts, gauges, heatmaps,
+    pie charts, scatter plots, and dozens more.
+  </p>
+
+  <h3>Key Features</h3>
+  <ul>
+    <li><strong>Full ECharts API</strong> &mdash; any chart type ECharts supports, this widget supports</li>
+    <li><strong>Up to 5 live datapoints</strong> &mdash; connect WinCC OA datapoints and use their live values</li>
+    <li><strong>Client-side history buffer</strong> &mdash; automatically accumulates live values over a configurable time range for trend charts</li>
+    <li><strong>Real-time updates</strong> &mdash; chart refreshes instantly when datapoint values change via WebSocket</li>
+    <li><strong>Error overlay</strong> &mdash; JavaScript errors are shown directly on the widget for easy debugging</li>
+    <li><strong>Integrated code editor</strong> &mdash; edit chart code directly in the widget settings panel</li>
+  </ul>
+</section>
+
+<!-- Installation -->
+<section id="installation">
+  <h2>Installation</h2>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li>WinCC OA 3.21 installed</li>
+    <li>A WinCC OA project with the Dashboard feature enabled</li>
+    <li>File system access to the project directory</li>
+  </ul>
+
+  <h3>Widget Files</h3>
+  <div class="file-tree">
+    <span class="folder">data/</span><br>
+    <span class="folder">&nbsp;&nbsp;dashboard-wc/</span><br>
+    <span class="file">&nbsp;&nbsp;&nbsp;&nbsp;index.html</span> <span class="desc">&larr; Modified Dashboard page (import map + textarea fix)</span><br>
+    <span class="folder">&nbsp;&nbsp;&nbsp;&nbsp;entry/</span><br>
+    <span class="file">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;custom-widgets.js</span> <span class="desc">&larr; Widget web component</span><br>
+    <span class="folder">&nbsp;&nbsp;WebUI/</span><br>
+    <span class="folder">&nbsp;&nbsp;&nbsp;&nbsp;svg/</span><br>
+    <span class="file">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;custom-chart.svg</span> <span class="desc">&larr; Widget picker icon</span><br>
+    <span class="folder">&nbsp;&nbsp;&nbsp;&nbsp;widgets-v2/StandardLibrary/Charts/</span><br>
+    <span class="file">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;custom-chart.widget.json</span> <span class="desc">&larr; Widget descriptor</span><br>
+    <span class="file">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;custom-chart-json-schema.json</span> <span class="desc">&larr; Property schema</span><br>
+    <span class="file">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;custom-chart-ui-schema.json</span> <span class="desc">&larr; Settings panel layout</span><br>
+  </div>
+
+  <h3>Option A: Fresh Project (no existing customizations)</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p>Copy the <code>data/</code> directory from this repository into your WinCC OA project root:</p>
+      <pre><code>xcopy /E /I "source\data" "YOUR_PROJECT\data"</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p>Restart the WinCC OA web server.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p>Open the Dashboard in your browser. <strong>Custom Chart</strong> should appear under <strong>Standard Library &gt; Charts</strong> in the widget picker.</p>
+    </div>
+  </div>
+
+  <h3>Option B: Project with existing index.html customizations</h3>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <p>Copy the widget files (but NOT index.html):</p>
+      <pre><code>xcopy /E /I "source\data\WebUI" "YOUR_PROJECT\data\WebUI"
+xcopy /I "source\data\dashboard-wc\entry\custom-widgets.js" "YOUR_PROJECT\data\dashboard-wc\entry\"</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <p>Open your project's <code>data/dashboard-wc/index.html</code> and add this entry to the <code>imports</code> object inside the <code>&lt;script type="importmap"&gt;</code> block:</p>
+      <pre><code>"@etm-professional-control/wui-widgets/wui-widget-custom-chart/wui-widget-custom-chart.js": "./entry/custom-widgets.js"</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <p>Restart the WinCC OA web server and hard-refresh the browser (<kbd>Ctrl+Shift+R</kbd>).</p>
+    </div>
+  </div>
+
+  <div class="alert alert-info">
+    <strong>Note:</strong> If your project does not yet have a custom <code>index.html</code>, first copy the installation default:
+    <pre><code>copy "C:\Program Files\Siemens\WinCC_OA\3.21\data\dashboard-wc\index.html" "YOUR_PROJECT\data\dashboard-wc\index.html"</code></pre>
+    Then add the import map entry.
+  </div>
+</section>
+
+<!-- Usage -->
+<section id="usage">
+  <h2>Usage</h2>
+
+  <h3>Adding the Widget to a Dashboard</h3>
+  <ol>
+    <li>Open the Dashboard and create or edit a dashboard page</li>
+    <li>Click <strong>Add Widget</strong></li>
+    <li>Expand <strong>Standard Library &gt; Charts</strong></li>
+    <li>Drag <strong>Custom Chart</strong> onto the grid</li>
+    <li>A default line chart will appear</li>
+  </ol>
+
+  <h3>Configuring the Widget</h3>
+  <p>Click the widget's edit (gear) icon to open the settings sidebar. You will see these sections:</p>
+
+  <div class="card">
+    <h4>Content Section (always open)</h4>
+    <ul>
+      <li><strong>Datapoint 1</strong> &mdash; Select the primary WinCC OA datapoint to monitor</li>
+      <li><strong>Time Range</strong> &mdash; How long to keep values in the history buffer (e.g. <code>30s</code>, <code>5m</code>, <code>1h</code>, <code>1d</code>)</li>
+      <li><strong>Chart Code</strong> &mdash; JavaScript code editor where you write the ECharts configuration</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4>Additional Datapoints (collapsed by default)</h4>
+    <ul>
+      <li><strong>Datapoint 2</strong> through <strong>Datapoint 5</strong> &mdash; Optional additional datapoints for multi-series charts</li>
+    </ul>
+  </div>
+
+  <h3>Writing Chart Code</h3>
+  <p>
+    The Chart Code editor expects JavaScript that <strong>returns</strong> an
+    <a href="https://echarts.apache.org/en/option.html">ECharts option object</a>.
+    Your code has access to live datapoint values and accumulated history.
+  </p>
+
+  <div class="alert alert-tip">
+    <strong>Tip:</strong> You can browse the <a href="https://echarts.apache.org/examples/en/">ECharts Examples Gallery</a>,
+    find a chart you like, and adapt its code for this widget. See the
+    <a href="#converting">Converting ECharts Examples</a> section below.
+  </div>
+</section>
+
+<!-- API Reference -->
+<section id="api">
+  <h2>API Reference</h2>
+
+  <p>Your chart code runs as a JavaScript function with the following variables available:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Variable</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>dp[0]</code> .. <code>dp[4]</code></td>
+        <td>Object</td>
+        <td>Array of datapoint objects (up to 5). Always 5 entries; unused ones have <code>value: null</code>.</td>
+      </tr>
+      <tr>
+        <td><code>dp[i].value</code></td>
+        <td>any</td>
+        <td>The latest live value received via WebSocket. Can be number, string, boolean, etc.</td>
+      </tr>
+      <tr>
+        <td><code>dp[i].name</code></td>
+        <td>string</td>
+        <td>The datapoint address (e.g. <code>System1:ExampleDP_Arg1.</code>)</td>
+      </tr>
+      <tr>
+        <td><code>dp[i].history.values</code></td>
+        <td>Array</td>
+        <td>Array of past values, accumulated client-side within the configured time range</td>
+      </tr>
+      <tr>
+        <td><code>dp[i].history.timestamps</code></td>
+        <td>Array</td>
+        <td>Array of Unix timestamps (milliseconds) corresponding to each value</td>
+      </tr>
+      <tr>
+        <td><code>animation</code></td>
+        <td>boolean</td>
+        <td>Dashboard animation setting</td>
+      </tr>
+      <tr>
+        <td><code>font</code></td>
+        <td>string</td>
+        <td>Dashboard font family</td>
+      </tr>
+      <tr>
+        <td><code>bgColor</code></td>
+        <td>string</td>
+        <td>Dashboard background color</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Time Range Format</h3>
+  <table>
+    <thead>
+      <tr><th>Value</th><th>Duration</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>30s</code></td><td>30 seconds</td></tr>
+      <tr><td><code>5m</code></td><td>5 minutes</td></tr>
+      <tr><td><code>1h</code></td><td>1 hour (default)</td></tr>
+      <tr><td><code>12h</code></td><td>12 hours</td></tr>
+      <tr><td><code>1d</code></td><td>1 day</td></tr>
+    </tbody>
+  </table>
+
+  <h3>How the History Buffer Works</h3>
+  <p>
+    Each time a datapoint value changes (via WebSocket), the widget stores the value and current
+    timestamp into a client-side ring buffer. Values older than the configured <strong>Time Range</strong>
+    are automatically removed. This means:
+  </p>
+  <ul>
+    <li>History only accumulates while the dashboard page is open</li>
+    <li>Refreshing the page clears the buffer</li>
+    <li>The buffer grows as values arrive &mdash; it starts empty and fills over time</li>
+    <li>Use <code>dp[i].history.timestamps</code> and <code>dp[i].history.values</code> for trend/line charts</li>
+    <li>Use <code>dp[i].value</code> for current-value displays like gauges or bar charts</li>
+  </ul>
+</section>
+
+<!-- Examples -->
+<section id="examples">
+  <h2>Examples</h2>
+  <p>Ready-to-use chart code for the Custom Chart widget. Each example shows a live preview rendered with sample data. Copy any example into the Chart Code editor.</p>
+
+  <!-- Example 1 -->
+  <div class="example" id="ex-1">
+    <div class="example-header">
+      <h3>Basic Line Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">Simple line chart showing one datapoint's value over time.</div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+var d = dp[0];
+if (d.history && d.history.timestamps) {
+  data = d.history.timestamps.map(function(t, i) {
+    return [t, d.history.values[i]];
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'time' },
+  yAxis: { type: 'value' },
+  series: [{
+    name: d.name || 'Value',
+    type: 'line',
+    data: data,
+    smooth: false
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2 -->
+  <div class="example" id="ex-2">
+    <div class="example-header">
+      <h3>Smooth Line Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Same as basic line but with smooth curve interpolation.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=line-smooth" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+var d = dp[0];
+if (d.history && d.history.timestamps) {
+  data = d.history.timestamps.map(function(t, i) {
+    return [t, d.history.values[i]];
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'time' },
+  yAxis: { type: 'value' },
+  series: [{
+    name: d.name || 'Value',
+    type: 'line',
+    data: data,
+    smooth: true
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 3 -->
+  <div class="example" id="ex-3">
+    <div class="example-header">
+      <h3>Multi-Line Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-3">3 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Multiple datapoints as separate lines on the same chart.
+      Assign 3 datapoints in widget settings.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=line-stack" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var series = [];
+
+for (var i = 0; i &lt; 3; i++) {
+  var d = dp[i];
+  if (d.value == null && d.history.values.length === 0) continue;
+
+  var data = d.history.timestamps.map(function(t, j) {
+    return [t, d.history.values[j]];
+  });
+
+  series.push({
+    name: d.name || ('DP ' + (i + 1)),
+    type: 'line',
+    data: data,
+    smooth: true
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  legend: { data: series.map(function(s) { return s.name; }) },
+  xAxis: { type: 'time' },
+  yAxis: { type: 'value' },
+  series: series
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 4 -->
+  <div class="example" id="ex-4">
+    <div class="example-header">
+      <h3>Stacked Line Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-3">3 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Lines stacked on top of each other to show cumulative values.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=line-stack" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var series = [];
+
+for (var i = 0; i &lt; 3; i++) {
+  var d = dp[i];
+  if (d.value == null && d.history.values.length === 0) continue;
+
+  var data = d.history.timestamps.map(function(t, j) {
+    return [t, d.history.values[j]];
+  });
+
+  series.push({
+    name: d.name || ('DP ' + (i + 1)),
+    type: 'line',
+    stack: 'total',
+    data: data,
+    smooth: true
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  legend: { data: series.map(function(s) { return s.name; }) },
+  xAxis: { type: 'time' },
+  yAxis: { type: 'value' },
+  series: series
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 5 -->
+  <div class="example" id="ex-5">
+    <div class="example-header">
+      <h3>Area Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Line chart with a filled area underneath.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=area-basic" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+var d = dp[0];
+if (d.history && d.history.timestamps) {
+  data = d.history.timestamps.map(function(t, i) {
+    return [t, d.history.values[i]];
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'time', boundaryGap: false },
+  yAxis: { type: 'value' },
+  series: [{
+    name: d.name || 'Value',
+    type: 'line',
+    data: data,
+    areaStyle: {},
+    smooth: true
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 6 -->
+  <div class="example" id="ex-6">
+    <div class="example-header">
+      <h3>Stacked Area Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-3">3 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Multiple datapoints as stacked filled areas.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=area-stack" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var series = [];
+
+for (var i = 0; i &lt; 3; i++) {
+  var d = dp[i];
+  if (d.value == null && d.history.values.length === 0) continue;
+
+  var data = d.history.timestamps.map(function(t, j) {
+    return [t, d.history.values[j]];
+  });
+
+  series.push({
+    name: d.name || ('DP ' + (i + 1)),
+    type: 'line',
+    stack: 'total',
+    areaStyle: {},
+    data: data,
+    smooth: true
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  legend: { data: series.map(function(s) { return s.name; }) },
+  xAxis: { type: 'time', boundaryGap: false },
+  yAxis: { type: 'value' },
+  series: series
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 7 -->
+  <div class="example" id="ex-7">
+    <div class="example-header">
+      <h3>Step Line Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Ideal for digital/boolean signals or discrete state changes. Step options: <code>start</code>, <code>middle</code>, <code>end</code>.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=line-step" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+var d = dp[0];
+if (d.history && d.history.timestamps) {
+  data = d.history.timestamps.map(function(t, i) {
+    return [t, d.history.values[i]];
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'time' },
+  yAxis: { type: 'value' },
+  series: [{
+    name: d.name || 'Value',
+    type: 'line',
+    step: 'start',
+    data: data
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 8 -->
+  <div class="example" id="ex-8">
+    <div class="example-header">
+      <h3>Gradient Area Lines</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-5">Up to 5 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">All datapoints with gradient-filled areas and distinct colors.</div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var colors = [
+  ['rgba(58,77,233,0.8)', 'rgba(58,77,233,0.1)'],
+  ['rgba(255,112,67,0.8)', 'rgba(255,112,67,0.1)'],
+  ['rgba(102,187,106,0.8)', 'rgba(102,187,106,0.1)'],
+  ['rgba(171,71,188,0.8)', 'rgba(171,71,188,0.1)'],
+  ['rgba(255,202,40,0.8)', 'rgba(255,202,40,0.1)']
+];
+var series = [];
+
+for (var i = 0; i &lt; 5; i++) {
+  var d = dp[i];
+  if (d.value == null && d.history.values.length === 0) continue;
+
+  var data = d.history.timestamps.map(function(t, j) {
+    return [t, d.history.values[j]];
+  });
+
+  series.push({
+    name: d.name || ('DP ' + (i + 1)),
+    type: 'line',
+    smooth: true,
+    data: data,
+    areaStyle: {
+      color: {
+        type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+        colorStops: [
+          { offset: 0, color: colors[i][0] },
+          { offset: 1, color: colors[i][1] }
+        ]
+      }
+    }
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  legend: {},
+  xAxis: { type: 'time', boundaryGap: false },
+  yAxis: { type: 'value' },
+  series: series
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 9 -->
+  <div class="example" id="ex-9">
+    <div class="example-header">
+      <h3>Line with Min/Max Markers</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Line chart with markers for min/max values and an average reference line.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=line-marker" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+var d = dp[0];
+if (d.history && d.history.timestamps) {
+  data = d.history.timestamps.map(function(t, i) {
+    return [t, d.history.values[i]];
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  xAxis: { type: 'time' },
+  yAxis: { type: 'value' },
+  series: [{
+    name: d.name || 'Value',
+    type: 'line',
+    data: data,
+    smooth: true,
+    markPoint: {
+      data: [
+        { type: 'max', name: 'Max' },
+        { type: 'min', name: 'Min' }
+      ]
+    },
+    markLine: {
+      data: [
+        { type: 'average', name: 'Average' }
+      ]
+    }
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 10 -->
+  <div class="example" id="ex-10">
+    <div class="example-header">
+      <h3>Dual Y-Axis</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-2">2 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">Two datapoints with independent Y-axes. Useful when DPs have different units or scales (e.g. temperature vs. pressure).</div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data0 = [];
+var data1 = [];
+
+if (dp[0].history && dp[0].history.timestamps) {
+  data0 = dp[0].history.timestamps.map(function(t, i) {
+    return [t, dp[0].history.values[i]];
+  });
+}
+if (dp[1].history && dp[1].history.timestamps) {
+  data1 = dp[1].history.timestamps.map(function(t, i) {
+    return [t, dp[1].history.values[i]];
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'axis' },
+  legend: {},
+  xAxis: { type: 'time' },
+  yAxis: [
+    { type: 'value', name: dp[0].name || 'DP 1' },
+    { type: 'value', name: dp[1].name || 'DP 2' }
+  ],
+  series: [
+    {
+      name: dp[0].name || 'DP 1',
+      type: 'line',
+      data: data0,
+      smooth: true
+    },
+    {
+      name: dp[1].name || 'DP 2',
+      type: 'line',
+      yAxisIndex: 1,
+      data: data1,
+      smooth: true
+    }
+  ]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 11 -->
+  <div class="example" id="ex-11">
+    <div class="example-header">
+      <h3>Bump Chart / Line Race</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-3">3 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Animated comparison with end labels.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=line-race" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var series = [];
+
+for (var i = 0; i &lt; 3; i++) {
+  var d = dp[i];
+  if (d.value == null && d.history.values.length === 0) continue;
+
+  var data = d.history.timestamps.map(function(t, j) {
+    return [t, d.history.values[j]];
+  });
+
+  series.push({
+    name: d.name || ('DP ' + (i + 1)),
+    symbolSize: 20,
+    type: 'line',
+    smooth: true,
+    emphasis: { focus: 'series' },
+    endLabel: {
+      show: true,
+      formatter: '{a}',
+      distance: 20
+    },
+    lineStyle: { width: 4 },
+    data: data
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  title: { text: 'Bump Chart' },
+  tooltip: { trigger: 'item' },
+  grid: { left: 30, right: 110, bottom: 30, containLabel: true },
+  xAxis: { type: 'time', splitLine: { show: true }, boundaryGap: false },
+  yAxis: { type: 'value' },
+  series: series
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 12 -->
+  <div class="example" id="ex-12">
+    <div class="example-header">
+      <h3>Gauge</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Displays the latest value as a gauge meter. No history needed.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=gauge" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  series: [{
+    type: 'gauge',
+    detail: { formatter: '{value}' },
+    data: [{
+      value: dp[0].value || 0,
+      name: dp[0].name || 'Value'
+    }]
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 13 -->
+  <div class="example" id="ex-13">
+    <div class="example-header">
+      <h3>Gauge with Color Zones</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-1">1 DP</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">Gauge with green/blue/red severity zones.</div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  series: [{
+    type: 'gauge',
+    axisLine: {
+      lineStyle: {
+        width: 15,
+        color: [
+          [0.3, '#67e0e3'],
+          [0.7, '#37a2da'],
+          [1, '#fd666d']
+        ]
+      }
+    },
+    pointer: { itemStyle: { color: 'auto' } },
+    detail: { formatter: '{value}', fontSize: 24 },
+    data: [{
+      value: dp[0].value || 0,
+      name: dp[0].name || 'Value'
+    }]
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 14 -->
+  <div class="example" id="ex-14">
+    <div class="example-header">
+      <h3>Bar Chart &mdash; Live Values</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-3">3 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Compares current values of multiple datapoints as colored bars.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=bar-simple" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var names = [];
+var values = [];
+var barColors = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de'];
+
+for (var i = 0; i &lt; 3; i++) {
+  if (dp[i].value == null) continue;
+  names.push(dp[i].name || ('DP ' + (i + 1)));
+  values.push(dp[i].value);
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: {},
+  xAxis: { type: 'category', data: names },
+  yAxis: { type: 'value' },
+  series: [{
+    type: 'bar',
+    data: values.map(function(v, i) {
+      return { value: v, itemStyle: { color: barColors[i] } };
+    })
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 15 -->
+  <div class="example" id="ex-15">
+    <div class="example-header">
+      <h3>Pie Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-5">Up to 5 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Pie chart showing proportions of current datapoint values.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=pie-simple" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+
+for (var i = 0; i &lt; 5; i++) {
+  if (dp[i].value == null) continue;
+  data.push({
+    name: dp[i].name || ('DP ' + (i + 1)),
+    value: dp[i].value
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'item' },
+  legend: { orient: 'vertical', left: 'left' },
+  series: [{
+    type: 'pie',
+    radius: '60%',
+    data: data,
+    emphasis: {
+      itemStyle: {
+        shadowBlur: 10,
+        shadowOffsetX: 0,
+        shadowColor: 'rgba(0, 0, 0, 0.5)'
+      }
+    }
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 16 -->
+  <div class="example" id="ex-16">
+    <div class="example-header">
+      <h3>Doughnut Chart</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-5">Up to 5 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Pie chart with a center hole. Shows label on hover.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=pie-doughnut" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+
+for (var i = 0; i &lt; 5; i++) {
+  if (dp[i].value == null) continue;
+  data.push({
+    name: dp[i].name || ('DP ' + (i + 1)),
+    value: dp[i].value
+  });
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: { trigger: 'item' },
+  legend: { top: '5%', left: 'center' },
+  series: [{
+    type: 'pie',
+    radius: ['40%', '70%'],
+    avoidLabelOverlap: false,
+    label: { show: false, position: 'center' },
+    emphasis: {
+      label: { show: true, fontSize: 20, fontWeight: 'bold' }
+    },
+    data: data
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 17 -->
+  <div class="example" id="ex-17">
+    <div class="example-header">
+      <h3>Scatter Plot (X vs Y)</h3>
+      <div class="example-meta">
+        <span class="dp-count dp-2">2 DPs</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+    </div>
+    <div class="example-desc">
+      Plots DP 1 values on X-axis vs DP 2 values on Y-axis. Values are paired by arrival order.
+      <a href="https://echarts.apache.org/examples/en/editor.html?c=scatter-simple" target="_blank">ECharts original</a>
+    </div>
+    <div class="example-preview"><span class="example-preview-label">Live Preview</span></div>
+    <button class="code-toggle" onclick="toggleCode(this)">Show Code</button>
+    <div class="example-code">
+      <div class="example-body">
+        <pre><code>var data = [];
+var h0 = dp[0].history;
+var h1 = dp[1].history;
+var len = Math.min(h0.values.length, h1.values.length);
+
+for (var i = 0; i &lt; len; i++) {
+  data.push([h0.values[i], h1.values[i]]);
+}
+
+return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  tooltip: {},
+  xAxis: { name: dp[0].name || 'DP 1' },
+  yAxis: { name: dp[1].name || 'DP 2' },
+  series: [{
+    type: 'scatter',
+    symbolSize: 10,
+    data: data
+  }]
+};</code></pre>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- Converting ECharts Examples -->
+<section id="converting">
+  <h2>Converting ECharts Examples</h2>
+  <p>
+    You can use any example from the <a href="https://echarts.apache.org/examples/en/">Apache ECharts Examples Gallery</a>
+    in the Custom Chart widget. Here's how to convert them:
+  </p>
+
+  <h3>Step-by-Step Conversion</h3>
+
+  <div class="card">
+    <h4>1. Replace <code>option = { ... }</code> with <code>return { ... }</code></h4>
+    <p>ECharts examples assign to a variable. The Custom Chart widget expects you to <strong>return</strong> the object.</p>
+    <pre><code>// BEFORE (ECharts example)
+option = {
+  xAxis: { type: 'category', data: ['Mon', 'Tue'] },
+  series: [{ data: [150, 230], type: 'line' }]
+};
+
+// AFTER (Custom Chart widget)
+return {
+  xAxis: { type: 'category', data: ['Mon', 'Tue'] },
+  series: [{ data: [150, 230], type: 'line' }]
+};</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>2. Replace static data with live datapoints</h4>
+    <p>
+      Instead of hardcoded arrays, use <code>dp[i].value</code> for current values
+      or <code>dp[i].history</code> for time-series data.
+    </p>
+    <pre><code>// BEFORE: static data
+series: [{ data: [150, 230, 224, 218, 135], type: 'line' }]
+
+// AFTER: live history from datapoint 1
+var data = dp[0].history.timestamps.map(function(t, i) {
+  return [t, dp[0].history.values[i]];
+});
+series: [{ data: data, type: 'line' }]</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>3. Use <code>type: 'time'</code> for the X-axis</h4>
+    <p>
+      When plotting live data over time, change the xAxis from <code>category</code> to <code>time</code>.
+      Remove any static <code>xAxis.data</code> array &mdash; timestamps come from the data points.
+    </p>
+    <pre><code>// BEFORE: category axis with labels
+xAxis: { type: 'category', data: ['Mon', 'Tue', 'Wed'] }
+
+// AFTER: automatic time axis
+xAxis: { type: 'time' }</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>4. Add dashboard integration variables</h4>
+    <p>Use <code>animation</code>, <code>font</code>, and <code>bgColor</code> so the chart respects dashboard settings.</p>
+    <pre><code>return {
+  animation: animation,
+  textStyle: { fontFamily: font },
+  backgroundColor: bgColor,
+  // ... rest of options
+};</code></pre>
+  </div>
+
+  <div class="card">
+    <h4>5. Handle multiple series with a loop</h4>
+    <p>If the original example has multiple static series, convert them to a loop over <code>dp[]</code>:</p>
+    <pre><code>// BEFORE: multiple hardcoded series
+series: [
+  { name: 'Email', data: [120, 132, 101] },
+  { name: 'Video', data: [220, 182, 191] }
+]
+
+// AFTER: dynamic from datapoints
+var series = [];
+for (var i = 0; i &lt; 3; i++) {
+  var d = dp[i];
+  if (d.value == null && d.history.values.length === 0) continue;
+  var data = d.history.timestamps.map(function(t, j) {
+    return [t, d.history.values[j]];
+  });
+  series.push({
+    name: d.name || ('DP ' + (i + 1)),
+    type: 'line',
+    data: data
+  });
+}</code></pre>
+  </div>
+
+  <div class="alert alert-warn">
+    <strong>Important:</strong> Some ECharts examples use ES6 syntax like arrow functions (<code>=&gt;</code>),
+    <code>let</code>/<code>const</code>, or template literals. These work in modern browsers but for
+    maximum compatibility, prefer <code>var</code> and <code>function()</code> syntax in the widget code editor.
+  </div>
+</section>
+
+<!-- Troubleshooting -->
+<section id="troubleshooting">
+  <h2>Troubleshooting</h2>
+
+  <div class="card">
+    <h3>Widget doesn't appear in the picker</h3>
+    <ul>
+      <li>Verify <code>data/dashboard-wc/index.html</code> exists in your project and contains the import map entry for <code>wui-widget-custom-chart</code></li>
+      <li>Clear browser cache with <kbd>Ctrl+Shift+R</kbd> &mdash; the Dashboard uses a service worker that caches aggressively</li>
+      <li>Check that all 3 JSON files exist in <code>data/WebUI/widgets-v2/StandardLibrary/Charts/</code></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Widget appears but chart is blank</h3>
+    <ul>
+      <li>Open DevTools (F12) and check the Console for import errors</li>
+      <li>Navigate directly to <code>https://&lt;host&gt;:&lt;port&gt;/dashboard/entry/custom-widgets.js</code> &mdash; it should load without a 404</li>
+      <li>Ensure at least one datapoint is assigned in the widget settings</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Chart code errors</h3>
+    <ul>
+      <li>JavaScript errors are shown in a <strong>red overlay</strong> at the bottom of the widget</li>
+      <li>Common issues: missing <code>return</code> statement, syntax errors, accessing undefined properties</li>
+      <li>Make sure your code returns a valid object, not <code>undefined</code></li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>History buffer is empty</h3>
+    <ul>
+      <li>The buffer only fills while the dashboard page is open &mdash; it starts empty on page load</li>
+      <li>Wait for datapoint values to change (the buffer stores each new value as it arrives)</li>
+      <li>Check that the datapoint is correctly configured and producing values</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Changes not visible after editing files</h3>
+    <ul>
+      <li>Always hard-refresh with <kbd>Ctrl+Shift+R</kbd></li>
+      <li>The Dashboard is a PWA &mdash; the service worker may serve cached versions of JavaScript files</li>
+      <li>In stubborn cases, open DevTools &gt; Application &gt; Service Workers &gt; Unregister, then refresh</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>WinCC OA version upgrade</h3>
+    <ul>
+      <li>After upgrading WinCC OA, copy the <strong>new</strong> installation's <code>index.html</code> to your project</li>
+      <li>Re-add the import map entry for <code>wui-widget-custom-chart</code></li>
+      <li>The widget files (<code>custom-widgets.js</code>, JSON schemas, SVG icon) are forward-compatible</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<div class="container">
+  <div class="support-banner">
+    <h2>Support BlocIoT</h2>
+    <p>If you find this project useful, please support us by following BlocIoT on YouTube and LinkedIn!</p>
+    <div class="social-links">
+      <a href="https://www.youtube.com/@blociot" target="_blank" class="social-link social-yt">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        YouTube
+      </a>
+      <a href="https://www.linkedin.com/company/blociot/" target="_blank" class="social-link social-li">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://github.com/BlocIoT" target="_blank" class="social-link social-gh">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>
+    Custom Chart Widget for WinCC OA Dashboard &mdash; An open-source project by <a href="https://github.com/BlocIoT" target="_blank">BlocIoT</a>
+  </p>
+  <p>
+    Built with <a href="https://echarts.apache.org/" target="_blank">Apache ECharts</a> &middot;
+    Licensed under <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache 2.0</a>
+  </p>
+  <p style="margin-top:8px;">
+    <a href="https://www.youtube.com/@blociot" target="_blank">YouTube</a> &middot;
+    <a href="https://www.linkedin.com/company/blociot/" target="_blank">LinkedIn</a> &middot;
+    <a href="https://github.com/BlocIoT" target="_blank">GitHub</a>
+  </p>
+  <p style="margin-top:12px;">
+    <a href="https://echarts.apache.org/en/option.html" target="_blank">ECharts Option Reference</a> &middot;
+    <a href="https://echarts.apache.org/examples/en/" target="_blank">ECharts Examples Gallery</a> &middot;
+    <a href="https://www.winccoa.com/documentation/WinCCOA/latest/en_US/Dashboard/topics/Dashboard_Basics.html" target="_blank">WinCC OA Dashboard Docs</a>
+  </p>
+</footer>
+
+<!-- ECharts CDN -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+
+<script>
+function copyCode(btn) {
+  var pre = btn.closest('.example').querySelector('pre code');
+  var text = pre.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+function toggleCode(btn) {
+  var codeDiv = btn.nextElementSibling;
+  var isOpen = codeDiv.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  btn.textContent = isOpen ? 'Hide Code' : 'Show Code';
+}
+
+// --- Mock data generator ---
+function seededRandom(seed) {
+  var x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function generateTimeSeries(seed, points, baseValue, amplitude) {
+  var now = 1718100000000; // fixed reference timestamp
+  var interval = 30000; // 30s between points
+  var timestamps = [];
+  var values = [];
+  var val = baseValue;
+  for (var i = 0; i < points; i++) {
+    timestamps.push(now - (points - i) * interval);
+    val = baseValue + amplitude * Math.sin(i * 0.15 + seed) + amplitude * 0.3 * Math.sin(i * 0.4 + seed * 2);
+    val += (seededRandom(i * 13 + seed * 7) - 0.5) * amplitude * 0.4;
+    values.push(Math.round(val * 100) / 100);
+  }
+  return { timestamps: timestamps, values: values };
+}
+
+function generateStepData(seed, points) {
+  var now = 1718100000000;
+  var interval = 30000;
+  var timestamps = [];
+  var values = [];
+  var state = 0;
+  for (var i = 0; i < points; i++) {
+    timestamps.push(now - (points - i) * interval);
+    if (seededRandom(i * 17 + seed * 3) > 0.7) {
+      state = state === 0 ? 1 : 0;
+    }
+    values.push(state);
+  }
+  return { timestamps: timestamps, values: values };
+}
+
+function makeDp(name, value, history) {
+  return {
+    name: name,
+    value: value,
+    history: history || { timestamps: [], values: [] }
+  };
+}
+
+function emptyDp(i) {
+  return { name: 'DP ' + (i + 1), value: null, history: { timestamps: [], values: [] } };
+}
+
+// Mock data sets per example
+var mockData = {};
+
+// Ex 1,2,5,9: 1 DP with history (sine wave around 50)
+(function() {
+  var h = generateTimeSeries(1, 60, 50, 20);
+  var lastVal = h.values[h.values.length - 1];
+  var dp0 = makeDp('Temperature', lastVal, h);
+  var rest = [emptyDp(1), emptyDp(2), emptyDp(3), emptyDp(4)];
+  mockData['ex-1'] = [dp0].concat(rest);
+  mockData['ex-2'] = [dp0].concat(rest);
+  mockData['ex-5'] = [dp0].concat(rest);
+  mockData['ex-9'] = [dp0].concat(rest);
+})();
+
+// Ex 7: step line (boolean-like)
+(function() {
+  var h = generateStepData(42, 60);
+  var lastVal = h.values[h.values.length - 1];
+  mockData['ex-7'] = [makeDp('Pump Status', lastVal, h), emptyDp(1), emptyDp(2), emptyDp(3), emptyDp(4)];
+})();
+
+// Ex 3,4,6,11: 3 DPs with history
+(function() {
+  var h0 = generateTimeSeries(10, 60, 40, 15);
+  var h1 = generateTimeSeries(20, 60, 60, 12);
+  var h2 = generateTimeSeries(30, 60, 30, 18);
+  var d = [
+    makeDp('Reactor A', h0.values[h0.values.length - 1], h0),
+    makeDp('Reactor B', h1.values[h1.values.length - 1], h1),
+    makeDp('Reactor C', h2.values[h2.values.length - 1], h2),
+    emptyDp(3),
+    emptyDp(4)
+  ];
+  mockData['ex-3'] = d;
+  mockData['ex-4'] = d;
+  mockData['ex-6'] = d;
+  mockData['ex-11'] = d;
+})();
+
+// Ex 8: 5 DPs with history (gradient)
+(function() {
+  var dps = [];
+  var names = ['Flow Rate', 'Pressure', 'Temperature', 'Humidity', 'Vibration'];
+  for (var i = 0; i < 5; i++) {
+    var h = generateTimeSeries(100 + i * 7, 60, 30 + i * 12, 10 + i * 3);
+    dps.push(makeDp(names[i], h.values[h.values.length - 1], h));
+  }
+  mockData['ex-8'] = dps;
+})();
+
+// Ex 10: 2 DPs with history (different scales)
+(function() {
+  var h0 = generateTimeSeries(50, 60, 22, 5);
+  var h1 = generateTimeSeries(60, 60, 1013, 15);
+  mockData['ex-10'] = [
+    makeDp('Temperature (°C)', h0.values[h0.values.length - 1], h0),
+    makeDp('Pressure (hPa)', h1.values[h1.values.length - 1], h1),
+    emptyDp(2), emptyDp(3), emptyDp(4)
+  ];
+})();
+
+// Ex 12,13: gauge (single value)
+(function() {
+  var dp0 = makeDp('Motor Speed', 72, { timestamps: [], values: [] });
+  mockData['ex-12'] = [dp0, emptyDp(1), emptyDp(2), emptyDp(3), emptyDp(4)];
+  mockData['ex-13'] = [dp0, emptyDp(1), emptyDp(2), emptyDp(3), emptyDp(4)];
+})();
+
+// Ex 14: bar chart (3 current values)
+(function() {
+  mockData['ex-14'] = [
+    makeDp('Line 1 Output', 847),
+    makeDp('Line 2 Output', 623),
+    makeDp('Line 3 Output', 1102),
+    emptyDp(3), emptyDp(4)
+  ];
+})();
+
+// Ex 15,16: pie/doughnut (5 current values)
+(function() {
+  var d = [
+    makeDp('Motor A', 320),
+    makeDp('Motor B', 240),
+    makeDp('Motor C', 180),
+    makeDp('Motor D', 130),
+    makeDp('Motor E', 90)
+  ];
+  mockData['ex-15'] = d;
+  mockData['ex-16'] = d;
+})();
+
+// Ex 17: scatter (2 DPs, correlated)
+(function() {
+  var h0 = generateTimeSeries(70, 80, 50, 25);
+  var h1vals = [];
+  for (var i = 0; i < h0.values.length; i++) {
+    h1vals.push(h0.values[i] * 1.3 + (seededRandom(i * 31 + 5) - 0.5) * 20 + 10);
+  }
+  var h1 = { timestamps: h0.timestamps.slice(), values: h1vals };
+  mockData['ex-17'] = [
+    makeDp('Sensor X', h0.values[h0.values.length - 1], h0),
+    makeDp('Sensor Y', h1.values[h1.values.length - 1], h1),
+    emptyDp(2), emptyDp(3), emptyDp(4)
+  ];
+})();
+
+// --- Render all previews ---
+document.addEventListener('DOMContentLoaded', function() {
+  var examples = document.querySelectorAll('.example[id]');
+  examples.forEach(function(el) {
+    var id = el.id;
+    var previewDiv = el.querySelector('.example-preview');
+    var codeEl = el.querySelector('pre code');
+    if (!previewDiv || !codeEl || !mockData[id]) return;
+
+    var chart = echarts.init(previewDiv, 'dark');
+    var code = codeEl.textContent;
+    var dp = mockData[id];
+    var animation = true;
+    var font = 'sans-serif';
+    var bgColor = 'transparent';
+
+    try {
+      var fn = new Function('dp', 'animation', 'font', 'bgColor', code);
+      var option = fn(dp, animation, font, bgColor);
+      if (option) {
+        chart.setOption(option);
+      }
+    } catch (e) {
+      previewDiv.innerHTML = '<div style="color:#f78166;padding:20px;font-size:13px;">Preview error: ' + e.message + '</div>';
+    }
+
+    // Resize on window resize
+    window.addEventListener('resize', function() { chart.resize(); });
+  });
+});
+</script>
+
+</body>
+</html>

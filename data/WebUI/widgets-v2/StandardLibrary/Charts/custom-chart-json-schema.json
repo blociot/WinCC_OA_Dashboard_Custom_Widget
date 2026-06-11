@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "value": {},
+    "value2": {},
+    "value3": {},
+    "value4": {},
+    "value5": {},
+    "chartCode": { "type": "string" },
+    "timeRange": { "type": "string" },
+    "showTooltip": { "type": "boolean" }
+  }
+}

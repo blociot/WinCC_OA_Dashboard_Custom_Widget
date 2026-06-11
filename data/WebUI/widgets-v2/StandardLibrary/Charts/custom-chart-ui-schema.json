@@ -1,0 +1,84 @@
+{
+  "$schema": "./../../ui-schema-reference.json",
+  "type": "object",
+  "elements": [
+    {
+      "type": "WuiLayout",
+      "label": "WUI_Settings.Area.Content",
+      "options": {
+        "collapsible": "open",
+        "showFirstElementAsHeader": false,
+        "noborder": true
+      },
+      "elements": [
+        {
+          "type": "ContextControl",
+          "scope": "#/properties/value",
+          "label": "Datapoint 1",
+          "options": { "contextInputType": "dpconnect" }
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/timeRange",
+          "label": "Time Range (e.g. 1h, 30m, 1d)"
+        },
+        {
+          "type": "TextareaControl",
+          "label": "Chart Code (JavaScript)",
+          "scope": "#/properties/chartCode"
+        }
+      ]
+    },
+    {
+      "type": "WuiLayout",
+      "label": "Additional Datapoints",
+      "options": {
+        "collapsible": true,
+        "showFirstElementAsHeader": false,
+        "noborder": true
+      },
+      "elements": [
+        {
+          "type": "ContextControl",
+          "scope": "#/properties/value2",
+          "label": "Datapoint 2",
+          "options": { "contextInputType": "dpconnect" }
+        },
+        {
+          "type": "ContextControl",
+          "scope": "#/properties/value3",
+          "label": "Datapoint 3",
+          "options": { "contextInputType": "dpconnect" }
+        },
+        {
+          "type": "ContextControl",
+          "scope": "#/properties/value4",
+          "label": "Datapoint 4",
+          "options": { "contextInputType": "dpconnect" }
+        },
+        {
+          "type": "ContextControl",
+          "scope": "#/properties/value5",
+          "label": "Datapoint 5",
+          "options": { "contextInputType": "dpconnect" }
+        }
+      ]
+    },
+    {
+      "type": "WuiLayout",
+      "label": "WUI_Settings.Area.Formatting",
+      "options": {
+        "collapsible": true,
+        "showFirstElementAsHeader": false,
+        "noborder": true
+      },
+      "elements": [
+        {
+          "type": "CheckboxControl",
+          "label": "WUI_Settings.ShowTooltip",
+          "scope": "#/properties/showTooltip"
+        }
+      ]
+    }
+  ]
+}
