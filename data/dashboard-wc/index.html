@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en" data-ix-theme="classic" data-ix-color-schema="dark">
+  <head>
+    <script>
+      (function() {
+        var origConnected = HTMLTextAreaElement.prototype.connectedCallback;
+        var desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'style');
+        var origAppend = Node.prototype.appendChild;
+        Node.prototype.appendChild = function(child) {
+          var result = origAppend.call(this, child);
+          if (child && child.tagName === 'TEXTAREA') {
+            child.style.setProperty('height', '480px', 'important');
+            child.style.setProperty('width', '100%', 'important');
+            child.style.setProperty('min-height', '480px', 'important');
+            child.style.setProperty('font-family', 'monospace', 'important');
+            child.style.setProperty('font-size', '13px', 'important');
+            child.style.setProperty('line-height', '1.4', 'important');
+            child.style.setProperty('white-space', 'pre', 'important');
+            child.style.setProperty('resize', 'vertical', 'important');
+            child.rows = 20;
+            function fixParents() {
+              var p = child.parentNode;
+              while (p) {
+                if (p.style) {
+                  p.style.setProperty('width', '100%', 'important');
+                  p.style.setProperty('max-width', '100%', 'important');
+                }
+                if (p.parentNode) {
+                  p = p.parentNode;
+                } else if (p.host) {
+                  p = p.host;
+                } else {
+                  break;
+                }
+              }
+            }
+            fixParents();
+            setTimeout(fixParents, 50);
+            setTimeout(fixParents, 200);
+          }
+          return result;
+        };
+      })();
+    </script>
+    <script>window.__WUI_USE_IMPORT_MAP__=true;</script>
+    <meta charset="utf-8" />
+    <title>WinCC OA Dashboard</title>
+    <base href="./" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="ix:legacy-icons" content="false" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link
+      rel="preload"
+      href="/data/dashboard-wc/appconfig.json"
+      as="fetch"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/data/dashboard-wc/menuconfig.json"
+      as="fetch"
+      crossorigin="anonymous"
+    />
+
+
+
+    <link rel="stylesheet" href="/WebUI_Colors" />
+    <script>
+      (function () {
+        var __DEV__ = false;
+        if (
+          !__DEV__ &&
+          (location.pathname === '/' || location.pathname === '/index.html')
+        ) {
+          // Preserve existing hash (location.hash already contains the leading '#')
+          location.replace(
+            '/data/dashboard-wc/index.html' + (location.hash || '')
+          );
+        }
+      })();
+    </script>
+  <link rel="stylesheet" href="./assets/wui.css">
+    <script type="importmap">
+{
+  "imports": {
+    "@siemens/ix": "./entry/ix.js",
+    "@siemens/ix-echarts": "./entry/ix.js",
+    "@siemens/ix/loader": "./entry/ix.js",
+    "@siemens/ix-icons": "./entry/ix-icons.js",
+    "@siemens/ix-icons/icons": "./entry/ix-icons.js",
+    "@siemens/ix-icons/loader": "./entry/ix-icons.js",
+    "lit": "./entry/lit.js",
+    "lit/async-directive.js": "./entry/lit.js",
+    "lit/decorators.js": "./entry/lit.js",
+    "lit/directive-helpers.js": "./entry/lit.js",
+    "lit/directive.js": "./entry/lit.js",
+    "lit/directives/choose.js": "./entry/lit.js",
+    "lit/directives/class-map.js": "./entry/lit.js",
+    "lit/directives/if-defined.js": "./entry/lit.js",
+    "lit/directives/keyed.js": "./entry/lit.js",
+    "lit/directives/map.js": "./entry/lit.js",
+    "lit/directives/ref.js": "./entry/lit.js",
+    "lit/directives/repeat.js": "./entry/lit.js",
+    "lit/directives/style-map.js": "./entry/lit.js",
+    "lit/directives/unsafe-html.js": "./entry/lit.js",
+    "lit/directives/until.js": "./entry/lit.js",
+    "lit/directives/when.js": "./entry/lit.js",
+    "@lit/context": "./entry/lit.js",
+    "@lit/reactive-element": "./entry/lit.js",
+    "@lit/task": "./entry/lit.js",
+    "lit-element": "./entry/lit.js",
+    "lit-html": "./entry/lit.js",
+    "lit-translate": "./entry/lit.js",
+    "@lit-labs/observers": "./entry/lit.js",
+    "@lit-labs/observers/resize-controller.js": "./entry/lit.js",
+    "@lit-labs/virtualizer": "./entry/lit.js",
+    "@lit-labs/virtualizer/layouts/grid.js": "./entry/lit.js",
+    "@lit-labs/virtualizer/virtualize.js": "./entry/lit.js",
+    "rxjs": "./entry/rxjs.js",
+    "reflect-metadata": "./entry/wui.js",
+    "@etm-professional-control/oa-rx-js-api": "./entry/wui.js",
+    "tsyringe": "./entry/wui.js",
+    "@etm-professional-control/wui-alert-data/alert-service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-dashboard-data/constant/widgets-path.js": "./entry/wui.js",
+    "@etm-professional-control/wui-dashboard-data/controllers/dashboard-removed/dashboard-removed.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-dashboard-data/controllers/dashboard-updated/dashboard-updated.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-dashboard-data/services/dashboard/dashboard.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-dashboard-data/services/widget-selector/widget-selector.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-dashboard-data/services/widgets/widgets.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-data-selector-data/interfaces/cns-search-details.js": "./entry/wui.js",
+    "@etm-professional-control/wui-data-selector-data/interfaces/dpe-search-details.js": "./entry/wui.js",
+    "@etm-professional-control/wui-data-selector-data/interfaces/search-result.js": "./entry/wui.js",
+    "@etm-professional-control/wui-data-selector-data/wui-cns/wui-cns.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-data-selector-data/wui-dpe-tree/wui-dpe-tree.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-data-selector-data/wui-dpe/wui-dpe.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-file-selector-data/wui-file-selector/wui-file-selector.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/abstractions/constructor.type.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/form-component.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/wui-input-error.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/wui-ix-form-component.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/wui-json-form-context-wrapper/wui-json-form-context-wrapper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/wui-json-form/wui-json-form.context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/wui-json-form/wui-json-form.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/components/wui-series-item/wui-series-item.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/contexts/form-context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/contexts/form-data-context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/contexts/live-datapoint-context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/contexts/wui-data-point-context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/contexts/wui-series-context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/controllers/wui-live-data-point/wui-live-data-point.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/enums/context-input-type.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/enums/context-option-value.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/enums/form-control-type.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/context-input-type-mapping.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/context-input-value.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/context-ui-options.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/default-validators.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/dependencies.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/field-context-info.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/form-context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/form-control-data.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/form-control.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/icon-toggle-button-group-renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/multi-select-schema.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/name-value.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/renderer-config.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/validator-type.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/interfaces/validity-details.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/mixins/wui-modal.mixin.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/alert-filter/alert-filter.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/cameras/cameras.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/color-selector/color-selector.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/context-input/context-input.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/dashboard/dashboard.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/data-selector/data-selector.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/default-renderers.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/font-size-select/font-size-select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/format-selector/format-selector.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/format-selector/formatters/wui-custom-formatter/wui-custom-formatter.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/format-selector/formatters/wui-number-formatter/wui-number-formatter.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/horizontal-group/horizontal-group.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/icon-position-select/icon-position-select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/icon-selector/icon-selector.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/icon-size-select/icon-size-select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/icon-toggle-button-group/icon-toggle-button-group.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/info/info.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/layout/wui-layout.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/multi-lang-text/multi-lang-text.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/nodemap/wui-nodemap-edit/wui-nodemap-edit.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/nodemap/wui-nodemap.renderer.helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/nodemap/wui-nodemap.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/nodemap/wui-nodemap.renderer.types.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/placeholder/placeholder.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/range/range.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/select/select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/series-group/series-group.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/tooltip/tooltip.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/vertical-group/vertical-group.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-alignment-select/wui-alignment-select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-checkbox/wui-checkbox.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-data-point/wui-custom-data-point-controls.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-data-point/wui-data-point.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-file-selector/wui-file-selector.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-mapping/wui-mapping-dialog/show-mapping-dialog.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-mapping/wui-mapping-dialog/wui-mapping-dialog.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-mapping/wui-mapping-edit/wui-mapping-edit.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-mapping/wui-mapping.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-number-input/wui-number-input.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-orientation-select/wui-orientation-select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-position-select/wui-position-select.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-tab/wui-tab.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-text-input/wui-text-input.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-textarea/wui-textarea.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-time-range/wui-time-range.renderer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/renderers/wui-typed-value/wui-typed-value.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/schemas/index.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/services/form-rules/form-rules.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/services/wui-json-form/wui-json-form.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/styles/form-input.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/styles/group.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/testers/is-color-control.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/testers/is-range-control.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/testers/ui-scope-includes.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/utils/json-form-helpers.js": "./entry/wui.js",
+    "@etm-professional-control/wui-forms/utils/renderer-selection.js": "./entry/wui.js",
+    "@etm-professional-control/wui-iam-data/helper/check-for-param.js": "./entry/wui.js",
+    "@etm-professional-control/wui-iam-data/helper/get-search-param.js": "./entry/wui.js",
+    "@etm-professional-control/wui-iam-data/token-service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-iam-data/user-service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/events/wui-dialog-event.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-action-card/wui-action-card-event.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-action-card/wui-action-card.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-button/wui-button.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-color-selector/wui-color-selector.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-content-header/wui-content-header.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-dialog/wui-dialog.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-icon-button/wui-icon-button.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-ix-loader/wui-ix-loader.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-kpi/wui-kpi.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-label/wui-label.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-spinner/wui-spinner.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-tabs/wui-tabs.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ix-wrappers/wui-toast/wui-toast.js": "./entry/wui.js",
+    "@etm-professional-control/wui-mapping-data/default-mapping.js": "./entry/wui.js",
+    "@etm-professional-control/wui-mapping-data/mapping-service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/abstracts/wui-context-base/wui-context-base.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/abstracts/wui-context-dp-base/wui-context-dp-base.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/abstracts/wui-context-event/wui-context-event.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/abstracts/wui-context-leaf/wui-context-leaf.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-alertconnect/wui-context-alertconnect.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-alertfilter/wui-context-alertfilter.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-alerthistory/wui-context-alerthistory.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-apidecorator/wui-context-apidecorator.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-apiinfo/wui-context-apiinfo.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-array/wui-context-array.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-authentication/wui-context-authentication.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-browserinfo/wui-context-browserinfo.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-callapi.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-connectionstate/wui-context-connectionstate.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-custom-command/wui-context-custom-command.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-data-point/wui-context-data-point-helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-data-point/wui-context-data-point.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpconnect/wui-context-dpconnect.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpconnectalertcolor/wui-context-dpconnectalertcolor.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpget/wui-context-dpget.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpgetavailableconfigs/wui-context-dpgetavailableconfigs.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpgetdescription/wui-context-dpgetdescription.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpgetformat/wui-context-dpgetformat.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpgetpvrange/wui-context-dpgetpvrange.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpgetunit/wui-context-dpgetunit.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpnames/wui-context-dpnames.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpqueryconnect/wui-context-dpqueryconnect.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-dpset/wui-context-dpset.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-echo-event.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-generator/wui-context-generator.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-group/wui-context-group.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-historicalconnect/wui-context-historicalconnect.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-historicaldata/wui-context-historicaldata.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-interval/wui-context-interval.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-licenses/wui-context-licenses.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-mapping/wui-context-mapping.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-navigation/wui-context-navigation.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-query/wui-context-query.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-root/wui-context-root.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-serviceworker/wui-context-serviceworker.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-static/wui-context-static.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-time/wui-context-time.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-translate/wui-context-translate.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/components/wui-context-winccoa/wui-context-winccoa.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/helpers/import-context-module.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/helpers/wui-dpconnectalertcolor-helpers.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/helpers/wui-dpset-helpers.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/helpers/wui-historicalconnect-helpers.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/helpers/wui-historicaldata-helpers.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-context/wui-context-helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/backend-connection.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/dp-connect-cache.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/dp-connect-handler.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/get-locals.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/interfaces/disk-dp-space.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/interfaces/emergency-mode-info.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/interfaces/license-status-info.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/interfaces/oa-version.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/interfaces/warning.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/interfaces/wui-settings.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/register-oa-rx-js-api.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/wui-emergency-mode.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/wui-license-status.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-oarxjs-data/wui-settings-service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/contexts/widget-types/widget-types.context.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/controllers/before-leave/before-leave-controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/controllers/before-unload/before-unload.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/controllers/clipboard/clipboard.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/controllers/file/file.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/controllers/navigate-to/navigate-to-controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/controllers/wui-system-info/wui-system-info.controller.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/debounce.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/directives/subscribe-directive.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/helper-css.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/helper-datapoint-name.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/is-not-null.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/parseTimeRange.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/central-timer/central-timer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/date/date.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/lazy-loader/lazy-loader.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/converters-charts.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/converters-web.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/converters-winccoa.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/legacy-adapter.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/legacy-defined-configs.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/legacy-models.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/legacy-adapter/utils.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/resource-policy/resource-policy.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-base-router.token.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-base-url.token.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-index-page.token.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-route-generator.interface.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-route-generator.token.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-route.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-router-service.token.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/router/wui-routes.token.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-cleanup/is-cleanable.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-cleanup/wui-cleanable-service.abstract.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-cleanup/wui-cleanup-handler-config.interface.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-cleanup/wui-cleanup-handler.interface.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-cleanup/wui-cleanup.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-system-info/wui-system-info.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/services/wui-toast/wui-toast.service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/styles/custom.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/styles/ix-core.js": "./entry/wui.js",
+    "@etm-professional-control/wui-shared/types/RouteListItem.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-datetime-range-button/wui-datetime-range-button.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-datetime-range-picker/wui-datetime-range-picker.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-debug-drawer/wui-debug-drawer.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-debug-toolbar/wui-debug-toolbar.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-debug/wui-debug.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-layout/wui-layout.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-search-bar/wui-search-bar.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-tree-table-toggle/wui-tree-table-toggle.js": "./entry/wui.js",
+    "@etm-professional-control/wui-ui-elements/wui-tree-table/wui-tree-table.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/helpers/helper-widgets.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/helpers/import-widget-module.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-echarts-with-legend/wui-echarts-with-legend.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-echarts/wui-echarts-scroll.mixin.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-echarts/wui-echarts.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-alert-table/wui-widget-alert-table.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-barchart-grouped/wui-widget-barchart-grouped.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-barchart/wui-widget-barchart.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-candlestick/wui-echarts-with-legend-candlestick.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-candlestick/wui-widget-candlestick.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-dashboard-generator/dashboard-generator-helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-dashboard-generator/wui-widget-dashboard-generator.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-debug/wui-widget-debug.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gantt/wui-echarts-gantt.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gantt/wui-widget-gantt-helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gantt/wui-widget-gantt.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gantt/wui-widget-gantt.model.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gauge/gauge-chart-type.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gauge/wui-widget-gauge-helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-gauge/wui-widget-gauge.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-grid-layout/wui-widget-grid-layout.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-iframe/wui-widget-iframe.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-kpi-list/wui-widget-kpi-list.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-label/wui-widget-label.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-pie/wui-pie-chart-type.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-pie/wui-widget-pie.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-progress-bar/wui-widget-progress-bar.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-sankey/wui-widget-sankey.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-sankey/wui-widget-sankey.types.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-set-point/wui-widget-set-point.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-slider/wui-widget-slider.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-structure/wui-structure-properties/wui-structure-properties.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-structure/wui-structure-section/wui-structure-section.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-structure/wui-widget-structure.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-switch/wui-widget-switch-helper.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-switch/wui-widget-switch.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-traffic-light/wui-widget-traffic-light.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-trend/wui-echarts-with-legend-trend.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-trend/wui-widget-trend.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-ulcux/ulcux-service.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-ulcux/wui-widget-ulcux-ui.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-ulcux/wui-widget-ulcux.events.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-ulcux/wui-widget-ulcux.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-ulcux/wui-widget-ulcux.types.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-video/wui-widget-video.js": "./entry/wui.js",
+    "@etm-professional-control/wui-widgets/wui-widget-custom-chart/wui-widget-custom-chart.js": "./entry/custom-widgets.js"
+  }
+}
+    </script>
+    <script type="module" crossorigin src="./entry/index.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index.css">
+  <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script>
+  </head>
+  <body>
+    <demo-app-ix></demo-app-ix>
+  </body>
+</html>
